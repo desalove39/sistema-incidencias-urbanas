@@ -1,0 +1,53 @@
+Aplicaste el patrón MTV (Model - Template - View) de Django. En otros frameworks se conoce como MVC (Model - View - Controller), pero en Django los nombres cambian un poco aunque la idea central es la misma.
+
+Efectivamente, esto se relaciona con la duda que tenías sobre por qué creamos la app sist_urb con sus propias carpetas y archivos cuando Django ya había generado la carpeta principal config.
+
+1. ¿Por qué creaste otra carpeta y más archivos si Django ya los había creado?
+Cuando ejecutas django-admin startproject config, Django crea la estructura global del edificio (la configuración general del servidor, la base de datos y el enrutador principal).
+
+Sin embargo, para construir el sistema por partes organizadas, Django usa una arquitectura basada en aplicaciones modulares:
+
+config (El Proyecto Global): Es el panel de control general. No debe llenarse de la lógica de negocio ni de plantillas visuales.
+
+sist_urb (La Aplicación de Negocio): Es el módulo especializado donde aplicas el patrón MTV para resolver el problema real (el sistema de incidencias urbanas).
+
+Por eso creamos la carpeta de la app y archivos propios como urls.py dentro de sist_urb: para mantener la lógica aislada y reusable.
+
+2. ¿Cómo aplicaste el patrón MTV paso a paso?
+El patrón MTV separa las responsabilidades de tu código en 3 capas distintas para que todo no esté mezclado en un solo archivo:
+
+Petición del usuario (Navegador)
+         │
+         ▼
+  [ Mapeo de URL ]  ──────►  config/urls.py ──> sist_urb/urls.py
+         │
+         ▼
+   [ V - VISTA ]    ──────►  sist_urb/views.py (index_view / error_404_view)
+         │
+         ▼
+[ T - TEMPLATE / Plantilla ] ──► sist_urb/templates/sist_urb/index.html / 404.html
+         │
+         ▼
+   Respuesta HTML al usuario
+
+1. T - Template (Plantilla / Capa Visual)
+Es la estructura HTML que ve el usuario en el navegador.
+
+Lo que hiciste: Creaste la carpeta templates/sist_urb/ y guardaste allí los archivos index.html y 404.html.
+
+Función: Define el diseño, la estructura visual y los mensajes sin preocuparse por la lógica interna del servidor.
+
+2. V - View (Vista / Capa de Lógica)
+Es la función encargada de procesar las peticiones y decidir qué respuesta entregar. (Nota: En el MVC tradicional, esto equivale al Controlador).
+
+Lo que hiciste: En sist_urb/views.py, creaste la función index_view y la función error_404_view.
+
+Función: Recibe el request (la petición del navegador), toma las decisiones y usa la función render() para combinar la lógica con la plantilla HTML correspondiente.
+
+3. M - Model (Modelo / Capa de Datos)
+Es la representación de las tablas de la base de datos escritas en código Python.
+
+Estado actual: Aún no creamos un modelo personalizado en sist_urb/models.py (lo haremos más adelante cuando registremos las incidencias urbanas en la base de datos db.sqlite3), pero Django utilizó sus modelos internos cuando ejecutamos las migraciones iniciales.
+
+Resumen rápido para tus compañeros
+"Django organiza el código separando el diseño (Template), la lógica (View) y los datos (Model). Creamos la aplicación sist_urb de forma independiente a config para que nuestro código siga esta estructura limpia: las rutas redirigen a la vista en views.py, y la vista se encarga de procesar y renderizar la plantilla HTML final."
